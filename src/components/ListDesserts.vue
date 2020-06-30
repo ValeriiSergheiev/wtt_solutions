@@ -94,7 +94,7 @@
 
 <script>
 export default {
-  name: 'ListEmployees',
+  name: 'ListDesserts',
   data: () => ({
     selected: [],
     selectedIndex: [],
@@ -234,7 +234,7 @@ export default {
     },
     save() {
       if (this.selectedIndex.length === 1) {
-        Object.assign(this.desserts[this.selectedIndex], this.formData)
+        Object.assign(this.desserts[this.selectedIndex[0]], this.formData)
       } else {
         this.desserts.unshift(this.formData)
       }

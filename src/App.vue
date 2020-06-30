@@ -28,20 +28,20 @@
 
     <v-main>
       <v-container>
-        <ListEmployees />
+        <ListDesserts />
       </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import ListEmployees from './components/ListDesserts'
+import ListDesserts from './components/ListDesserts'
 
 export default {
   name: 'App',
 
   components: {
-    ListEmployees
+    ListDesserts
   },
 
   data: () => ({
