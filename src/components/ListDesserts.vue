@@ -219,10 +219,12 @@ export default {
   methods: {
     addItem() {
       this.selected = []
+      this.modalTitle = 'Add'
       this.dialog = true
     },
     editItem() {
       this.formData = Object.assign({}, this.selected[0])
+      this.modalTitle = 'Edit'
       this.dialog = true
     },
     deleteItem() {
