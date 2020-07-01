@@ -40,7 +40,7 @@
                     <v-text-field
                       v-model="formData.name"
                       :error-messages="nameErrors"
-                      :counter="10"
+                      :counter="20"
                       required
                       @input="$v.name.$touch()"
                       @blur="$v.name.$touch()"
@@ -50,6 +50,10 @@
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
                       v-model="formData.calories"
+                      :error-messages="caloriesErrors"
+                      required
+                      @input="$v.calories.$touch()"
+                      @blur="$v.calories.$touch()"
                       label="Calories"
                     ></v-text-field>
                   </v-col>
@@ -102,12 +106,13 @@
 
 <script>
 import { validationMixin } from 'vuelidate'
-import { required, maxLength, email } from 'vuelidate/lib/validators'
+import { required, maxLength, email, numeric } from 'vuelidate/lib/validators'
 
 export default {
   mixins: [validationMixin],
   validations: {
-    name: { required, maxLength: maxLength(10) },
+    name: { required, maxLength: maxLength(20) },
+    calories: { required, numeric },
     email: { required, email }
   },
   name: 'ListDesserts',
@@ -281,7 +286,7 @@ export default {
       if (!this.$v.name.$dirty) return errors
       !this.$v.name.maxLength &&
         errors.push('Dessert must be at most 10 characters long')
-      !this.$v.name.required && errors.push('Dessert is required.')
+      !this.$v.name.required && errors.push('Dessert is required')
       return errors
     },
     emailErrors() {
@@ -291,8 +296,18 @@ export default {
       !this.$v.email.required && errors.push('E-mail is required')
       return errors
     },
+    caloriesErrors() {
+      const errors = []
+      if (!this.$v.calories.$dirty) return errors
+      !this.$v.calories.required && errors.push('Calories is required')
+      !this.$v.calories.numeric && errors.push('Numeric only')
+      return errors
+    },
     name() {
       return this.formData.name
+    },
+    calories() {
+      return this.formData.calories
     },
     email() {
       return this.formData.email
