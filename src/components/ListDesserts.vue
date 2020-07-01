@@ -39,39 +39,47 @@
                   <v-col cols="12">
                     <v-text-field
                       v-model="formData.name"
+                      :error-messages="nameErrors"
+                      :counter="10"
+                      required
+                      @input="$v.name.$touch()"
+                      @blur="$v.name.$touch()"
                       label="Dessert (100g serving)"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model.number="formData.calories"
+                      v-model="formData.calories"
                       label="Calories"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model.number="formData.fat"
+                      v-model="formData.fat"
                       label="Fat (g)"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model.number="formData.carbs"
+                      v-model="formData.carbs"
                       label="Carbs (g)"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model.number="formData.protein"
+                      v-model="formData.protein"
                       label="Protein (g)"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="12" sm="6" md="4">
-                    <v-select
-                      v-model="formData.iron"
-                      :items="['0%', '25%', '50%', '75%']"
-                      label="Iron (%)"
-                    ></v-select>
+                  <v-col cols="12" sm="6" md="8">
+                    <v-text-field
+                      v-model="formData.email"
+                      :error-messages="emailErrors"
+                      label="E-mail"
+                      required
+                      @input="$v.email.$touch()"
+                      @blur="$v.email.$touch()"
+                    ></v-text-field>
                   </v-col>
                 </v-row>
               </v-container>
@@ -93,7 +101,15 @@
 </template>
 
 <script>
+import { validationMixin } from 'vuelidate'
+import { required, maxLength, email } from 'vuelidate/lib/validators'
+
 export default {
+  mixins: [validationMixin],
+  validations: {
+    name: { required, maxLength: maxLength(10) },
+    email: { required, email }
+  },
   name: 'ListDesserts',
   data: () => ({
     selected: [],
@@ -109,7 +125,7 @@ export default {
       { text: 'Fat (g)', value: 'fat' },
       { text: 'Carbs (g)', value: 'carbs' },
       { text: 'Protein (g)', value: 'protein' },
-      { text: 'Iron (%)', value: 'iron' }
+      { text: 'Email', value: 'email' }
     ],
     dessertsJSON: [
       {
@@ -118,7 +134,7 @@ export default {
         fat: 6.0,
         carbs: 24,
         protein: 4.0,
-        iron: '1%'
+        email: 'email1@test.com'
       },
       {
         name: 'Ice cream sandwich',
@@ -126,7 +142,7 @@ export default {
         fat: 9.0,
         carbs: 37,
         protein: 4.3,
-        iron: '1%'
+        email: 'email2@test.com'
       },
       {
         name: 'Eclair',
@@ -134,7 +150,7 @@ export default {
         fat: 16.0,
         carbs: 23,
         protein: 6.0,
-        iron: '7%'
+        email: 'email3@test.com'
       },
       {
         name: 'Cupcake',
@@ -142,7 +158,7 @@ export default {
         fat: 3.7,
         carbs: 67,
         protein: 4.3,
-        iron: '8%'
+        email: 'email4@test.com'
       },
       {
         name: 'Gingerbread',
@@ -150,7 +166,7 @@ export default {
         fat: 16.0,
         carbs: 49,
         protein: 3.9,
-        iron: '16%'
+        email: 'email5@test.com'
       },
       {
         name: 'Jelly bean',
@@ -158,7 +174,7 @@ export default {
         fat: 0.0,
         carbs: 94,
         protein: 0.0,
-        iron: '0%'
+        email: 'email6@test.com'
       },
       {
         name: 'Lollipop',
@@ -166,7 +182,7 @@ export default {
         fat: 0.2,
         carbs: 98,
         protein: 0,
-        iron: '2%'
+        email: 'email7@test.com'
       },
       {
         name: 'Honeycomb',
@@ -174,7 +190,7 @@ export default {
         fat: 3.2,
         carbs: 87,
         protein: 6.5,
-        iron: '45%'
+        email: 'email8@test.com'
       },
       {
         name: 'Donut',
@@ -182,7 +198,7 @@ export default {
         fat: 25.0,
         carbs: 51,
         protein: 4.9,
-        iron: '22%'
+        email: 'email9@test.com'
       },
       {
         name: 'KitKat',
@@ -190,7 +206,7 @@ export default {
         fat: 26.0,
         carbs: 65,
         protein: 7,
-        iron: '6%'
+        email: 'email10@test.com'
       }
     ],
     desserts: [],
@@ -202,7 +218,7 @@ export default {
       fat: '',
       carbs: '',
       protein: '',
-      iron: ''
+      email: ''
     }
   }),
   mounted() {
@@ -218,6 +234,7 @@ export default {
   },
   methods: {
     addItem() {
+      this.$v.$reset()
       this.selected = []
       this.modalTitle = 'Add'
       this.dialog = true
@@ -235,26 +252,50 @@ export default {
       this.selected = []
     },
     save() {
-      if (this.selectedIndex.length === 1) {
-        Object.assign(this.desserts[this.selectedIndex[0]], this.formData)
-      } else {
-        this.desserts.unshift(this.formData)
-      }
-      this.dialog = false
-      this.selected = []
-      this.formData = {
-        name: '',
-        calories: '',
-        fat: '',
-        carbs: '',
-        protein: '',
-        iron: ''
+      this.$v.$touch()
+      if (!this.$v.$invalid) {
+        if (this.selectedIndex.length === 1) {
+          Object.assign(this.desserts[this.selectedIndex[0]], this.formData)
+        } else {
+          this.desserts.unshift(this.formData)
+        }
+        this.dialog = false
+        this.selected = []
+        this.formData = {
+          name: '',
+          calories: '',
+          fat: '',
+          carbs: '',
+          protein: '',
+          email: ''
+        }
       }
     }
   },
   computed: {
     isActiveBtn() {
       return this.selected.length !== 1
+    },
+    nameErrors() {
+      const errors = []
+      if (!this.$v.name.$dirty) return errors
+      !this.$v.name.maxLength &&
+        errors.push('Dessert must be at most 10 characters long')
+      !this.$v.name.required && errors.push('Dessert is required.')
+      return errors
+    },
+    emailErrors() {
+      const errors = []
+      if (!this.$v.email.$dirty) return errors
+      !this.$v.email.email && errors.push('Must be valid e-mail')
+      !this.$v.email.required && errors.push('E-mail is required')
+      return errors
+    },
+    name() {
+      return this.formData.name
+    },
+    email() {
+      return this.formData.email
     }
   }
 }
